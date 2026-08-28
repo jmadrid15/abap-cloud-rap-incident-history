@@ -1,0 +1,95 @@
+@Metadata.layer: #CORE
+
+@UI: {
+  headerInfo: {
+    typeName: 'History',
+    typeNamePlural: 'Histories',
+    title: {
+      type: #STANDARD,
+      value: 'HisId'
+    }
+  },
+
+  createHidden: true,
+
+
+  presentationVariant: [{
+    sortOrder: [{
+      by: 'HisId',
+      direction: #ASC
+    }],
+    visualizations: [{
+      type: #AS_LINEITEM
+    }]
+  }]
+}
+
+annotate entity ZC_INCT_H_615 with
+{
+
+  @UI.facet: [
+    {
+      id: 'HistoryHeader',
+      purpose: #STANDARD,
+      type: #IDENTIFICATION_REFERENCE,
+      label: 'History Details',
+      position: 10
+    }
+  ]
+
+
+  @UI.hidden: true
+  @UI.lineItem: [{ importance: #HIGH }]
+  HisUuid;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  @UI.lineItem: [{ importance: #HIGH }]
+  IncUuid;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 10, 
+                   importance: #MEDIUM }]
+  @UI.identification: [{ position: 10, 
+                         importance: #MEDIUM }]
+  @EndUserText.label: 'History ID'
+  HisId;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 20, 
+                   importance: #HIGH }]
+  @UI.identification: [{ position: 20, 
+                         importance: #HIGH }]
+                         
+  @EndUserText.label: 'Previous Status'
+  PreviousStatus;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 30, 
+                   importance: #HIGH }]
+  @UI.identification: [{ position: 30, 
+                         importance: #HIGH }]
+  @EndUserText.label: 'Incident Status'                       
+  NewStatus;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 40, 
+                   importance: #LOW }]
+  @UI.identification: [{ position: 40, 
+                         importance: #LOW }]
+  @EndUserText.label: 'Observation'
+  Text;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalCreatedBy;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalCreatedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalLastChangedBy;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalLastChangedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LastChangedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  _Incident;
+}

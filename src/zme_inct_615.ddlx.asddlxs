@@ -1,0 +1,153 @@
+@Metadata.layer: #CORE
+
+@UI: {
+  headerInfo: {
+    typeName: 'Incident',
+    typeNamePlural: 'Incidents',
+    title: {
+      type: #STANDARD,
+      value: 'IncidentId'
+    }
+  },
+  presentationVariant: [{
+    sortOrder: [{
+      by: 'IncidentId',
+      direction: #ASC
+    }],
+    visualizations: [{
+      type: #AS_LINEITEM
+    }]
+  }]
+}
+
+annotate entity ZC_INCT_615 with
+{
+
+  @UI.facet: [
+    {
+      id: 'IncidentHeader',
+      purpose: #STANDARD,
+      type: #IDENTIFICATION_REFERENCE,
+      label: 'Incident Details',
+      position: 10
+    },
+    {
+      id: 'HistoryList',
+      purpose: #STANDARD,
+      type: #LINEITEM_REFERENCE,
+      label: 'Incident History',
+      position: 20,
+      targetElement: '_History'
+    }
+  ]
+
+  @UI.hidden: true
+  
+  @UI.lineItem: [
+    { type: #FOR_ACTION, 
+      dataAction: 'changeStatus', 
+      label: 'Change Status', 
+      position: 10, 
+      importance: #HIGH } ]
+      
+  @UI.identification: [
+    { type: #FOR_ACTION, 
+      dataAction: 'changeStatus', 
+      label: 'Change Status', 
+      position: 10, 
+      importance: #HIGH } ]
+  IncUuid;
+---------------------------------------------------------------------------------------------------------------------------------
+  @EndUserText.label: 'Incident'
+  
+  @UI.lineItem: [{ position: 10, 
+                   importance: #MEDIUM }]
+                   
+  @UI.selectionField: [{ position: 10 }]
+  
+  @UI.identification: [{ position: 10, 
+                         importance: #MEDIUM }]
+  IncidentId;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 20, 
+                   importance: #MEDIUM }]
+                   
+  @UI.identification: [{ position: 20, 
+                         importance: #MEDIUM }]
+  @EndUserText.label: 'Title'
+  Title;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 30, 
+                   importance: #LOW }]
+                   
+  @UI.selectionField: [{ position: 20 }]
+  
+  @UI.identification: [{ position: 30, 
+                         importance: #LOW }]
+  @EndUserText.label: 'Incident Description'                       
+  Description;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 40, 
+                   importance: #HIGH }]
+                   
+  @UI.selectionField: [{ position: 30 }]
+  
+  @UI.identification: [{ position: 40, 
+                         importance: #HIGH }]
+  @EndUserText.label: 'Incident Status'                       
+  Status;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 50, 
+                   importance: #HIGH }]
+                   
+  @UI.selectionField: [{ position: 40 }]
+  
+  @UI.identification: [{ position: 50, 
+                         importance: #HIGH }]
+  @EndUserText.label: 'Incident Priority'                         
+  Priority;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 60, 
+                   importance: #LOW }]
+                   
+  @UI.selectionField: [{ position: 50 }]
+  
+  @UI.identification: [{ position: 60, 
+                         importance: #LOW }]
+  @EndUserText.label: 'Created Date'                       
+  CreationDate;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.lineItem: [{ position: 70, 
+                   importance: #LOW }]
+                   
+  @UI.selectionField: [{ position: 60 }]
+  
+  @UI.identification: [{ position: 70, 
+                         importance: #LOW }]
+  @EndUserText.label: 'Changed Date'                        
+  ChangedDate;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalCreatedBy;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalCreatedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalLastChangedBy;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LocalLastChangedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  LastChangedAt;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  _History;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  _Priority;
+---------------------------------------------------------------------------------------------------------------------------------
+  @UI.hidden: true
+  _Status;
+}

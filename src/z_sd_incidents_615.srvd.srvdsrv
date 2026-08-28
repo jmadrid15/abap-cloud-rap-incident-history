@@ -1,0 +1,5 @@
+@EndUserText.label: 'Incidents - History'
+define service Z_sd_incidents_615 {
+  expose ZC_INCT_615   as Incident;
+  expose ZC_INCT_H_615 as History;
+}
