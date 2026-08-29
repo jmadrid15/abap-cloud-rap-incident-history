@@ -55,12 +55,14 @@ class lhc_Incident implementation.
 
   method get_instance_features.
 
+    " Activación / Desactivación para la acción "changeStatus"
     read entities of zi_inct_615 in local mode
       entity Incident
       fields ( Status )
       with corresponding #( keys )
       result data(lt_incidents).
 
+    " Desactivar cuando Incident: Closed, Cancelado o Completado
     result = value #( for incident in lt_incidents (  %tky = incident-%tky
                                                       %action-changeStatus = cond #(
                                                         when incident-Status = incident_status-closed
@@ -116,7 +118,10 @@ class lhc_Incident implementation.
 
     loop at lt_incidents assigning field-symbol(<incident>).
 
+      " Recuperar valor del parámetro NewStatus (de la CDS Abstracta)
       data(lv_new_status)     = keys[ key id %tky = <incident>-%tky ]-%param-NewStatus.
+
+      " Almacenar el valor del antiguo incidente (será utilizado en las validaciones)
       data(lv_current_status) = <incident>-Status.
 
       " ----------------------------------------------------------------------
@@ -223,6 +228,10 @@ class lhc_Incident implementation.
         fields max( IncidentId )
         into @data(lv_max_incident_id).
 
+    " Valores predeterminados al momento de Create:
+    " IncidentId: incremental
+    " Status: Open
+    " CreationDate: Fecha Actual
     modify entities of zi_inct_615 in local mode
         entity Incident
         update fields ( IncidentId Status CreationDate )
@@ -244,6 +253,10 @@ class lhc_Incident implementation.
 
     check incidents is not initial.
 
+    " Valores predeterminados para la tabla History (Al momento de Create Incident)
+    " HisId: 1
+    " NewStatus: Open
+    " Text: First Incident
     modify entities of zi_inct_615 in local mode
       entity Incident
       create by \_History
@@ -274,6 +287,7 @@ class lhc_Incident implementation.
 
     data(lv_today) = cl_abap_context_info=>get_system_date( ).
 
+    " Actualizar la fecha al momento de Crear Incidente o Actualizar Campos
     modify entities of zi_inct_615 in local mode
       entity Incident
       update fields ( ChangedDate )
@@ -368,7 +382,7 @@ class lhc_Incident implementation.
         with corresponding #( keys )
         result data(lt_incidents).
 
-    " Obtener la fecha actual del sistema en ABAP Cloud
+    " Obtener la fecha actual del sistema
     data(lv_today) = cl_abap_context_info=>get_system_date( ).
 
     " 2. Evaluar cada registro
