@@ -1,47 +1,69 @@
-Incident Management System (ABAP Cloud / RAP Framework)
-A transactional module designed for full lifecycle management and historical auditing of incidents. Developed in ABAP Cloud using the ABAP RESTful Application Programming Model (RAP) with Draft support, and exposed via OData V4 for SAP Fiori Elements interfaces. 
-1. Overview
-The system enables users to create, query, update, transition states, and delete incidents under strict business rules. It ensures continuous auditing by automatically recording every status transition along with user observations into a dedicated history entity. 
-2. Architecture and Object Nomenclatures
-The repository follows a clean layer separation, utilizing the 615 object suffix: 
-•	Data Dictionary:
-o	Transactional Tables: ZDT_INCT_615 (Incidents), ZDT_INCT_H_615 (History). 
-o	Draft Tables: ZDT_INCT_615_D, ZDT_INCT_H_615_D. 
-o	Master Tables: ZDT_STATUS_615, ZDT_PRIORITY_615. 
-o	Domains & Data Elements: ZDO_STATUS_CODE_615, ZDO_PRIORITY_CODE_615, ZDE_STATUS_CODE_615, ZDE_PRIORITY_CODE_615. 
-•	Core Data Services (CDS):
-o	Interface Entities: ZI_INCT_615 (Root), ZI_INCT_H_615 (Child). 
-o	Value Helps: ZI_STATUS_615, ZI_PRIORITY_615. 
-o	Consumption Projections: ZC_INCT_615, ZC_INCT_H_615. 
-o	Abstract Entity (Pop-up Dialog): ZA_CHANGE_STATUS_615. 
-•	Behavior Layer:
-o	Behavior Definitions: ZI_INCT_615, ZC_INCT_615. 
-o	Behavior Pool Implementation: ZBP_I_INCT_615 (includes local handler LHC_INCIDENT and saver LSC_ZI_INCT_615). 
-•	Service & UI Layer:
-o	Service Definition: Z_SD_INCIDENTS_615. 
-o	Service Binding: Z_SB_INCIDENTS_615 (OData V4 - UI). 
-o	Metadata Extensions: ZME_INCT_615, ZME_INCT_H_615. 
-•	Utilities:
-o	Data Generator Class: ZCL_DATA_GENERATOR_615. 
-3. Technical Features and Implementation
-•	Managed with Draft: Fully managed RAP architecture with draft table handling (Edit, Activate, Discard, Resume, and Prepare standard actions). 
-•	Concurrency Control: Master-dependent locking mechanism with optimistic ETag controls using LastChangedAt and LocalLastChangedAt. 
-•	Custom Action changeStatus: Triggers a modal pop-up in the UI defined by the abstract entity ZA_CHANGE_STATUS_615 to capture the new status and optional observation. 
-•	Side Effects: Explicitly defined as action changeStatus affects entity _History; to trigger immediate UI refreshes for the history table in Fiori Elements. 
-•	In-Memory Local Buffer: Employs lcl_incident_buffer to pass observations captured during action execution over to the final save sequence (save_modified). 
-•	Custom Saver (LSC_ZI_INCT_615): Performs clean database inserts into zdt_inct_h_615 inside the save_modified phase, preventing RAP strict-phase read violations at runtime. 
-4. Validated Business Rules
-•	Mandatory Fields: Title, Description, and Priority are enforced as mandatory. 
-•	Automated Numbering: Auto-generates sequential IncidentId values, sets default status OP (Open), and timestamps CreationDate with system date upon instance creation. 
-•	Date Range Validations: Prevents future CreationDate entries and ensures ChangedDate cannot precede CreationDate. 
-•	Instance Authorizations: Restricts instance update permissions (%update) strictly to the record creator (LocalCreatedBy) or system Administrators. 
-•	State Transition Safeguards:
-o	Disables state changes on terminal states: Completed (CO), Closed (CL), and Canceled (CN). 
-o	Blocks direct status transitions from Pending (PE) to Completed (CO) or Closed (CL). 
-o	Mandates an assigned responsible user (LocalCreatedBy) prior to setting status to In Progress (IP). 
-5. Prerequisites and Setup
-1.	Environment: SAP BTP ABAP Environment or SAP S/4HANA with ABAP Cloud enablement. 
-2.	Tools: Eclipse IDE equipped with ABAP Development Tools (ADT).
-3.	Import: Clone this repository using abapGit into your local package hierarchy. 
-4.	Activation: Activate repository objects in the following order: Data Dictionary, Interface/Projection CDS Views, Behavior Definitions, Behavior Pools, Metadata Extensions, and Service Binding.
-5.	Data Population: Execute the utility class ZCL_DATA_GENERATOR_615 to seed master tables with initial lookup data. 
+# Incident Management System (ABAP Cloud / RAP Framework)
+
+A transactional module designed for full lifecycle management and historical auditing of incidents. Developed in **ABAP Cloud** using the **ABAP RESTful Application Programming Model (RAP)** with **Draft** support, and exposed via **OData V4** for **SAP Fiori Elements** interfaces.
+
+---
+
+## 1. Overview
+
+The system enables users to create, query, update, transition states, and delete incidents under strict business rules. It ensures continuous auditing by automatically recording every status transition along with user observations into a dedicated history entity.
+
+---
+
+## 2. Architecture and Object Nomenclatures
+
+The repository follows a clean layer separation, utilizing the `615` object suffix:
+
+* **Data Dictionary:**
+  * **Transactional Tables:** `ZDT_INCT_615` (Incidents), `ZDT_INCT_H_615` (History).
+  * **Draft Tables:** `ZDT_INCT_615_D`, `ZDT_INCT_H_615_D`.
+  * **Master Tables:** `ZDT_STATUS_615`, `ZDT_PRIORITY_615`.
+  * **Domains & Data Elements:** `ZDO_STATUS_CODE_615`, `ZDO_PRIORITY_CODE_615`, `ZDE_STATUS_CODE_615`, `ZDE_PRIORITY_CODE_615`.
+* **Core Data Services (CDS):**
+  * **Interface Entities:** `ZI_INCT_615` (Root), `ZI_INCT_H_615` (Child).
+  * **Value Helps:** `ZI_STATUS_615`, `ZI_PRIORITY_615`.
+  * **Consumption Projections:** `ZC_INCT_615`, `ZC_INCT_H_615`.
+  * **Abstract Entity (Pop-up Dialog):** `ZA_CHANGE_STATUS_615`.
+* **Behavior Layer:**
+  * **Behavior Definitions:** `ZI_INCT_615`, `ZC_INCT_615`.
+  * **Behavior Pool Implementation:** `ZBP_I_INCT_615` (includes local handler `LHC_INCIDENT` and saver `LSC_ZI_INCT_615`).
+* **Service & UI Layer:**
+  * **Service Definition:** `Z_SD_INCIDENTS_615`.
+  * **Service Binding:** `Z_SB_INCIDENTS_615` (OData V4 - UI).
+  * **Metadata Extensions:** `ZME_INCT_615`, `ZME_INCT_H_615`.
+* **Utilities:**
+  * **Data Generator Class:** `ZCL_DATA_GENERATOR_615`.
+
+---
+
+## 3. Technical Features and Implementation
+
+* **Managed with Draft:** Fully managed RAP architecture with draft table handling (`Edit`, `Activate`, `Discard`, `Resume`, and `Prepare` standard actions).
+* **Concurrency Control:** Master-dependent locking mechanism with optimistic ETag controls using `LastChangedAt` and `LocalLastChangedAt`.
+* **Custom Action `changeStatus`:** Triggers a modal pop-up in the UI defined by the abstract entity `ZA_CHANGE_STATUS_615` to capture the new status and optional observation.
+* **Side Effects:** Explicitly defined as `action changeStatus affects entity _History;` to trigger immediate UI refreshes for the history table in Fiori Elements.
+* **In-Memory Local Buffer:** Employs `lcl_incident_buffer` to pass observations captured during action execution over to the final save sequence (`save_modified`).
+* **Custom Saver (`LSC_ZI_INCT_615`):** Performs clean database inserts into `zdt_inct_h_615` inside the `save_modified` phase, preventing RAP strict-phase read violations at runtime.
+
+---
+
+## 4. Validated Business Rules
+
+* **Mandatory Fields:** `Title`, `Description`, and `Priority` are enforced as mandatory.
+* **Automated Numbering:** Auto-generates sequential `IncidentId` values, sets default status `OP` (Open), and timestamps `CreationDate` with system date upon instance creation.
+* **Date Range Validations:** Prevents future `CreationDate` entries and ensures `ChangedDate` cannot precede `CreationDate`.
+* **Instance Authorizations:** Restricts instance update permissions (`%update`) strictly to the record creator (`LocalCreatedBy`) or system Administrators.
+* **State Transition Safeguards:**
+  * Disables state changes on terminal states: **Completed (`CO`)**, **Closed (`CL`)**, and **Canceled (`CN`)**.
+  * Blocks direct status transitions from **Pending (`PE`)** to **Completed (`CO`)** or **Closed (`CL`)**.
+  * Mandates an assigned responsible user (`LocalCreatedBy`) prior to setting status to **In Progress (`IP`)**.
+
+---
+
+## 5. Prerequisites and Setup
+
+1. **Environment:** SAP BTP ABAP Environment or SAP S/4HANA with ABAP Cloud enablement.
+2. **Tools:** Eclipse IDE equipped with ABAP Development Tools (ADT).
+3. **Import:** Clone this repository using **abapGit** into your local package hierarchy.
+4. **Activation:** Activate repository objects in the following order: Data Dictionary, Interface/Projection CDS Views, Behavior Definitions, Behavior Pools, Metadata Extensions, and Service Binding.
+5. **Data Population:** Execute the utility class `ZCL_DATA_GENERATOR_615` to seed master tables with initial lookup data.
